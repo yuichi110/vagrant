@@ -3,9 +3,9 @@ Vagrant.configure("2") do |config|
   config.vm.network "public_network"
 
   config.vm.provider :virtualbox do |vbox|
-    vbox.name = "docker-host"
-    vbox.cpus = 1
-    vbox.memory = "2048"
+    vbox.name = "minikube"
+    vbox.cpus = 2
+    vbox.memory = "4096"
     vbox.gui = false
   end
 
@@ -28,10 +28,13 @@ Vagrant.configure("2") do |config|
     systemctl start docker
     docker --version
 
-    echo "4/5: Install docker-compose" 
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-    /usr/local/bin/docker-compose --version
+    echo "4/5: Install minikube" 
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    install minikube-linux-amd64 /usr/local/bin/minikube
+    echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+    /usr/local/bin/minikube --vm-driver=none start
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.16.0/bin/linux/amd64/kubectl
+    install kubectl /usr/local/bin/kubectl
 
     echo "5/5: Enable ssh password login and change passwords"
     sed -i -e 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
